@@ -45,11 +45,14 @@ for r in ins['wallet_directory_only']:
 # 3) verified detail pages (Instinct)
 for r in ins['verified_benefits']:
     club={'HOT':'הוט'}.get(r['club'],r['club'])
-    x=get(r['business']); x['i'].append({"c":club,"p":r['benefit'][:140],"d":(r.get('terms') or '')[:180],"u":r.get('source_url'),"b":r.get('branches') or [],"v":"verified"})
+    x=get(r['business']); x['i'].append({"c":club,"p":r['benefit'][:140],"d":(r.get('terms') or '')[:180],"u":r.get('source_url'),"b":[b if isinstance(b,str) else (b.get('name') or b.get('city') or b.get('address') or '') for b in (r.get('branches') or [])],"v":"verified"})
 # 4) coupons / specific offers seen today on the signed-in sites (not expired per source)
 cp=0
 for r in ins['discovery_only']:
     if r.get('source_reported_expired') or not r.get('benefit'): continue
+    if r['club']=='HOT' and 'hot.co.il' in (r.get('source_url') or ''):
+        c=chk.get(r['source_url'])
+        if not c or not c.get('has_details') or c.get('expired_words'): continue
     club={'HOT':'הוט'}.get(r['club'],r['club'])
     items.append({"n":r['business'],"a":[],"cat":(r.get('category') or '').replace(' NOVEMBER SALE','').strip() or "מבצעים","coupon":True,
                   "i":[{"c":club,"p":r['benefit'],"d":r.get('location_headline') or '',"u":r.get('source_url'),"b":[],"v":"discovery"}]}); cp+=1
