@@ -26,7 +26,7 @@ def search(q, limit=50):
 cat = json.load(open(P, encoding="utf-8"))
 GENERIC = {"המטבח", "שבילים", "לבן", "ואהבת", "טעימים", "ריטה", "אותנטי", "המזללה", "מלצרית"}
 for n, x in enumerate(cat["items"]):
-    if x.get("online"): x["L"] = []; continue
+    if x.get("online") or x.get("coupon"): x["L"] = []; continue
     keys = [k for k in dict.fromkeys(norm(a) for a in x.get("a", [x["n"]])) if len(k) >= 3]
     locs = {}
     for k in keys[:4]:
@@ -37,7 +37,7 @@ for n, x in enumerate(cat["items"]):
                 if k in GENERIC and k != nn: continue
                 locs[(la, lo)] = [la, lo, disp]
     for it in x["i"]:
-        for b in (it.get("b") or [])[:30]:
+        for b in [b for b in (it.get("b") or []) if isinstance(b, str)][:30]:
             for la, lo, name, disp in search(b, 1):
                 locs[(la, lo)] = [la, lo, disp]
     x["L"] = list(locs.values())[:200]

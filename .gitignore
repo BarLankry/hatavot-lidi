@@ -4,3 +4,8 @@ geocode.err
 catalog_aliases.json
 __pycache__/
 instinct/
+geocache.json
+hot_check*.json
+clubhub_raw.json
+*.log
+*.err

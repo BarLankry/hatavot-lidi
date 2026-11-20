@@ -38,6 +38,15 @@ main{padding:4px 16px 40px}
 .d a{color:var(--acc)}
 .nav{display:flex;gap:8px;margin-top:10px}
 .nav a{flex:1;text-align:center;text-decoration:none;font-size:13px;font-weight:700;border-radius:10px;padding:8px;background:#eef3f1;color:var(--ink)}
+.go2{display:block;width:calc(100% - 32px);margin:0 16px 10px;border:2px solid var(--acc);border-radius:16px;padding:13px;font-size:16px;font-weight:800;background:#fff;color:var(--acc);cursor:pointer}
+.ic{flex:none;width:46px;height:46px;border-radius:12px;background:#eef3f1;display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden}
+.ic img{width:100%;height:100%;object-fit:contain;background:#fff}
+.row{display:flex;gap:10px;align-items:flex-start}
+.row>div{flex:1;min-width:0}
+.t-g{background:#0e7490}
+.here{display:flex;gap:6px;margin:8px 0}
+.here input{flex:1;padding:10px;border:1px solid var(--line);border-radius:10px;font-size:15px}
+.warnv{font-size:11px;color:#9a6700;background:#fff5d6;border-radius:6px;padding:1px 6px;margin-inline-start:4px}
 .sec{font-size:13px;font-weight:800;color:var(--mute);margin:18px 2px 0}
 footer{color:var(--mute);font-size:11px;text-align:center;padding:0 16px 24px}
 </style>
@@ -47,9 +56,10 @@ footer{color:var(--mute);font-size:11px;text-align:center;padding:0 16px 24px}
   <h1>🏷️ הטבות לידי</h1>
   <div class="sub" id="upd">בהצדעה · הוט · 1824</div>
 </header>
-<button class="go" id="go">📍 מה יש לי כאן?</button>
-<div class="tabs"><button class="on" data-v="near">לידי</button><button data-v="all">כל ההטבות</button></div>
-<div class="filters" id="clubs"><button class="on" data-c="">כל המועדונים</button><button data-c="בהצדעה">בהצדעה</button><button data-c="הוט">הוט</button><button data-c="1824">1824</button></div>
+<button class="go" id="go">📍 מה יש לידי? (עד 1 ק״מ)</button>
+<button class="go2" id="here">🏪 אני בחנות – יש פה הטבה?</button>
+<div class="tabs"><button class="on" data-v="near">לידי</button><button data-v="deals">🎟️ מבצעים וקופונים</button><button data-v="all">כל ההטבות</button></div>
+<div class="filters" id="clubs"><button class="on" data-c="">כל המועדונים</button><button data-c="בהצדעה">בהצדעה</button><button data-c="הוט">הוט</button><button data-c="1824">1824</button><button data-c="גיפט">גיפט קארד</button></div>
 <input id="q" type="search" placeholder="חיפוש עסק או רשת…" style="display:none">
 <main id="list"><div class="st">לוחצים על הכפתור – והאפליקציה מוצאת את העסקים סביבך שיש לך בהם הנחה.</div></main>
 <footer id="foot"></footer>
@@ -58,7 +68,10 @@ let CAT=[], view="near", club="", query="", lastNear=null;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm=s=>String(s||"").toLowerCase().replace(/[׳'"״`’]/g,"").replace(/[^\p{L}\p{N} ]/gu," ").replace(/\s+/g," ").trim();
-const tagCls=c=>c.startsWith("בהצדעה")?"t-b":c.startsWith("הוט")?"t-h":"t-x";
+const tagCls=c=>c.startsWith("בהצדעה")?"t-b":c.startsWith("הוט")?"t-h":c.startsWith("גיפט")?"t-g":"t-x";
+const ICONS=[[/מסעד|בורגר|המבורגר|שניצל|גריל|סטייק|אסייתי|נודלס|סושי|פיצ|פסטה|חומוס|פלאפל|שווארמה|בשר|דיינר|ביסטרו|ארוחות/,"🍽️"],[/סושי/,"🍣"],[/פיצ/,"🍕"],[/בורגר/,"🍔"],[/קפה|coffee|cafe/i,"☕"],[/מאפ|לחם|בייקרי|קונדיטור|עוג/,"🥐"],[/גליד|ice ?cream/i,"🍦"],[/שוקולד|מתוק|sweet/i,"🍫"],[/יין|יקב|wine|בירה|אלכוהול/i,"🍷"],[/סופר|מרקט|מזון|שוק|מכולת|יוחננוף|ויקטורי|קרפור/,"🛒"],[/נעל|shoe|הנעלה|אלדו|steve/i,"👟"],[/אופנ|בגד|ג'ינס|jeans|זארה|zara|קסטרו|fox|הלבשה|גולף|רנואר|mango|h&o/i,"👕"],[/תכשיט|צורף|jewel/i,"💍"],[/אופטיק|משקפ/,"👓"],[/ספר|סטימצקי|book/i,"📚"],[/צעצוע|טויס|ילדים|תינוק|kids/i,"🧸"],[/חיות|pet|ג'ונגל/i,"🐾"],[/פארם|קוסמטיק|טיפוח|בושם|sabon|beauty/i,"💄"],[/ספורט|כושר|sport|fit/i,"⚽"],[/חשמל|אלקטרוני|מחשב|טלפון|ivory|באג|ksp/i,"🔌"],[/בית|רהיט|טקסטיל|מטבח|home|ace|הום/i,"🛋️"],[/קולנוע|סינמ|cinema/i,"🎬"],[/תיאטרון|הצג|מופע|הופע|היכל/,"🎭"],[/ספא|עיסוי|spa/i,"💆"],[/מלון|צימר|נופש|חופש|hotel/i,"🏨"],[/פארק|אטרקצי|מוזיאון|גן חיות|באולינג|טרמפולינ|קרטינג|ג'אמפ|jump/i,"🎡"],[/פרח|משתל/,"💐"],[/רכב|מוסך|דלק|צמיג/,"🚗"]];
+function emo(x){const t=x.n+" "+(x.cat||"")+" "+x.i.map(i=>i.d+" "+i.p).join(" ");let e="🏷️";for(const [re,ic] of ICONS){if(re.test(x.n)){return ic}}for(const [re,ic] of ICONS){if(re.test(t)){e=ic;break}}return e}
+function iconHTML(x){const img=x.img||(x.i.find(i=>i.img)||{}).img;return `<div class="ic">${img?`<img src="${esc(img)}" alt="" loading="lazy" onerror="this.parentNode.textContent='${emo(x)}'">`:emo(x)}</div>`}
 const clubOk=it=>!club||it.c.startsWith(club);
 
 async function loadCat(){
@@ -83,11 +96,11 @@ function matchPOI(names){
 function dist(a,b,c,d){const R=6371e3,t=Math.PI/180,x=(d-b)*t*Math.cos((a+c)/2*t),y=(c-a)*t;return Math.round(Math.sqrt(x*x+y*y)*R)}
 const fmtD=m=>m<1000?m+" מ׳":(m/1000).toFixed(1)+" ק״מ";
 function dealsHTML(x){
-  return x.i.filter(clubOk).map(it=>`<div class="d"><span class="tag ${tagCls(it.c)}">${esc(it.c)}</span><div><b>${esc(it.p)}</b>${it.d&&it.d!==x.n?`<small>${esc(it.d)}</small>`:""}${it.b&&it.b.length?`<small>סניפים: ${esc(it.b.slice(0,4).join(", "))}${it.b.length>4?"…":""}</small>`:""}${it.u?`<small><a href="${esc(it.u)}" target="_blank" rel="noopener">לפרטים ומימוש ›</a></small>`:""}</div></div>`).join("");
+  return x.i.filter(clubOk).map(it=>`<div class="d"><span class="tag ${tagCls(it.c)}">${esc(it.c)}</span><div><b>${esc(it.p)}</b>${it.v==="discovery"?'<span class="warnv">מהאתר היום – לוודא תנאים</span>':""}${it.d&&it.d!==x.n?`<small>${esc(it.d)}</small>`:""}${it.b&&it.b.length?`<small>סניפים: ${esc(it.b.slice(0,4).join(", "))}${it.b.length>4?"…":""}</small>`:""}${it.u?`<small><a href="${esc(it.u)}" target="_blank" rel="noopener">לפרטים ומימוש ›</a></small>`:""}</div></div>`).join("");
 }
 function card(x,extra){
   const dh=dealsHTML(x); if(!dh) return "";
-  return `<div class="c"><div class="ch"><b>${esc(extra&&extra.name||x.n)}</b>${extra?`<span class="dist">${fmtD(extra.d)}</span>`:""}</div>${extra&&extra.addr?`<div class="dist">${esc(String(extra.addr).split(",").slice(0,3).join(","))}</div>`:""}${dh}
+  return `<div class="c"><div class="row">${iconHTML(x)}<div><div class="ch"><b>${esc(extra&&extra.name||x.n)}</b>${extra?`<span class="dist">${fmtD(extra.d)}</span>`:""}</div>${extra&&extra.addr?`<div class="dist">${esc(String(extra.addr).split(",").slice(0,3).join(","))}</div>`:""}${dh}</div></div>
     ${extra?`<div class="nav"><a href="https://waze.com/ul?ll=${extra.lat},${extra.lon}&navigate=yes" target="_blank" rel="noopener">🚗 Waze</a><a href="https://www.google.com/maps/search/?api=1&query=${extra.lat},${extra.lon}" target="_blank" rel="noopener">🗺️ מפה</a></div>`:""}</div>`;
 }
 function renderNear(){
@@ -99,13 +112,19 @@ function renderNear(){
 }
 function renderAll(){
   const q=norm(query);
-  const L=CAT.filter(x=>x.i.some(clubOk)&&(!q||x.keys.some(k=>k.includes(q))||norm(x.n).includes(q)||norm(x.cat).includes(q)));
+  const L=CAT.filter(x=>!x.coupon&&x.i.some(clubOk)&&(!q||x.keys.some(k=>k.includes(q))||norm(x.n).includes(q)||norm(x.cat).includes(q)));
   $("#list").innerHTML=`<div class="sec">${L.length} עסקים</div>`+L.slice(0,150).map(x=>card(x)).join("");
 }
-function render(){view==="near"?(lastNear?renderNear():null):renderAll()}
+function renderDeals(){
+  const q=norm(query);
+  const L=CAT.filter(x=>x.coupon&&x.i.some(clubOk)&&(!q||norm(x.n+" "+x.cat).includes(q)));
+  const by={};for(const x of L){(by[x.cat||"מבצעים"]=by[x.cat||"מבצעים"]||[]).push(x)}
+  $("#list").innerHTML=L.length?Object.entries(by).map(([k,v])=>`<div class="sec">${esc(k)} (${v.length})</div>`+v.map(x=>card(x)).join("")).join(""):'<div class="st">אין כרגע מבצעים וקופונים ברשימה.</div>';
+}
+function render(){view==="near"?(lastNear?renderNear():null):view==="deals"?renderDeals():renderAll()}
 
 function findNear(lat,lon){
-  const run=r=>{const hits=[];for(const x of CAT){let best=null;for(const L of x.L||[]){const d=dist(lat,lon,L[0],L[1]);if(d<=r&&(!best||d<best.d))best={x,name:x.n,lat:L[0],lon:L[1],d,addr:L[2]}}if(best)hits.push(best)}return hits.sort((a,b)=>a.d-b.d)};
+  const run=r=>{const hits=[];for(const x of CAT){if(x.coupon)continue;let best=null;for(const L of x.L||[]){const d=dist(lat,lon,L[0],L[1]);if(d<=r&&(!best||d<best.d))best={x,name:x.n,lat:L[0],lon:L[1],d,addr:L[2]}}if(best)hits.push(best)}return hits.sort((a,b)=>a.d-b.d)};
   let r=1000,hits=run(r);
   if(hits.filter(h=>h.x.i.some(clubOk)).length<3){r=3000;hits=run(r)}
   lastNear={hits,count:CAT.filter(x=>(x.L||[]).length).length,r};renderNear();
@@ -121,10 +140,38 @@ $("#go").onclick=()=>{
   },e=>{$("#go").disabled=false;$("#list").innerHTML=`<div class="st">${e.code===1?"צריך לאשר גישה למיקום (הגדרות ← ספארי/כרום ← מיקום).":"לא הצלחתי לאתר מיקום, נסה שוב."}</div>`},{enableHighAccuracy:true,timeout:15000,maximumAge:60000});
 };
 document.querySelector(".tabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;view=b.dataset.v;document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===b));
-  $("#q").style.display=view==="all"?"block":"none";$("#go").style.display=view==="near"?"block":"none";
+  $("#q").style.display=view!=="near"?"block":"none";$("#go").style.display=$("#here").style.display=view==="near"?"block":"none";
   if(view==="near"&&!lastNear)$("#list").innerHTML='<div class="st">לוחצים על הכפתור – והאפליקציה מוצאת את העסקים סביבך שיש לך בהם הנחה.</div>';render()};
 $("#clubs").onclick=e=>{const b=e.target.closest("button");if(!b)return;club=b.dataset.c;document.querySelectorAll("#clubs button").forEach(x=>x.classList.toggle("on",x===b));render()};
 $("#q").oninput=e=>{query=e.target.value;renderAll()};
+// ---- "I'm in a store" ----
+async function reverseName(lat,lon){
+  try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&accept-language=he&namedetails=1`);const j=await r.json();
+    return [j.name,j.namedetails&&j.namedetails.name,j.namedetails&&j.namedetails["name:he"],j.namedetails&&j.namedetails["name:en"],j.namedetails&&j.namedetails.brand].filter(Boolean)}catch(e){return []}
+}
+function hereUI(msg){
+  $("#list").innerHTML=`${msg||""}<div class="here"><input id="hn" placeholder="או הקלד את שם החנות…"><button class="go2" style="margin:0;width:auto;padding:10px 14px" id="hb">בדוק</button></div><div id="hr"></div>`;
+  const go=()=>{const v=$("#hn").value.trim();if(!v)return;const x=matchPOI([v])||CAT.find(c=>!c.coupon&&c.keys.some(k=>k.includes(norm(v))));
+    $("#hr").innerHTML=x&&x.i.some(clubOk)?card(x):`<div class="st">לא מצאתי הטבה ל"${esc(v)}" ברשימה.</div>`};
+  $("#hb").onclick=go;$("#hn").onkeydown=e=>{if(e.key==="Enter")go()};
+}
+async function findHere(lat,lon,acc){
+  const R=Math.max(40,Math.min(120,(acc||30)+25));
+  const hits=[];for(const x of CAT){if(x.coupon)continue;for(const L of x.L||[]){const d=dist(lat,lon,L[0],L[1]);if(d<=R){hits.push({x,name:x.n,lat:L[0],lon:L[1],d,addr:L[2]});break}}}
+  const names=await reverseName(lat,lon);const m=matchPOI(names);
+  if(m&&!hits.some(h=>h.x===m))hits.unshift({x:m,name:names[0]||m.n,lat,lon,d:0,addr:""});
+  const H=hits.filter(h=>h.x.i.some(clubOk)).sort((a,b)=>a.d-b.d);
+  const where=names.length?`זיהיתי שאתה ב: <b>${esc(names[0])}</b><br>`:"";
+  if(H.length){$("#list").innerHTML=`<div class="sec">${where}${H.length===1?"יש פה הטבה:":"יש הטבות בעסקים ממש לידך:"} (טווח ${R} מ׳)</div>`+H.map(h=>card(h.x,h)).join("");}
+  else hereUI(`<div class="st">${where}לא מצאתי הטבה במקום הזה (טווח ${R} מ׳, דיוק מיקום ±${Math.round(acc||0)} מ׳).</div>`);
+}
+$("#here").onclick=()=>{
+  if(!navigator.geolocation){hereUI();return}
+  $("#here").disabled=true;$("#list").innerHTML='<div class="st">📍 בודק איפה אתה בדיוק…</div>';
+  navigator.geolocation.getCurrentPosition(async p=>{await findHere(p.coords.latitude,p.coords.longitude,p.coords.accuracy);$("#here").disabled=false},
+    e=>{$("#here").disabled=false;hereUI('<div class="st">לא הצלחתי לקבל מיקום מדויק.</div>')},{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+};
+window.__here=(a,b,c)=>findHere(a,b,c);
 window.__test=(lat,lon)=>findNear(lat,lon);
 loadCat().catch(()=>{$("#upd").textContent="לא הצלחתי לטעון את רשימת ההטבות"});
 </script>
