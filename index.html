@@ -42,7 +42,7 @@ main{padding:4px 16px 40px}
 .ic{flex:none;width:46px;height:46px;border-radius:12px;background:#eef3f1;display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden}
 .ic img{width:100%;height:100%;object-fit:contain;background:#fff}
 .row{display:flex;gap:10px;align-items:flex-start}
-.row>div{flex:1;min-width:0}
+.row>div:not(.ic){flex:1;min-width:0}
 .t-g{background:#0e7490}
 .here{display:flex;gap:6px;margin:8px 0}
 .here input{flex:1;padding:10px;border:1px solid var(--line);border-radius:10px;font-size:15px}
@@ -69,7 +69,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm=s=>String(s||"").toLowerCase().replace(/[׳'"״`’]/g,"").replace(/[^\p{L}\p{N} ]/gu," ").replace(/\s+/g," ").trim();
 const tagCls=c=>c.startsWith("בהצדעה")?"t-b":c.startsWith("הוט")?"t-h":c.startsWith("גיפט")?"t-g":"t-x";
-const ICONS=[[/מסעד|בורגר|המבורגר|שניצל|גריל|סטייק|אסייתי|נודלס|סושי|פיצ|פסטה|חומוס|פלאפל|שווארמה|בשר|דיינר|ביסטרו|ארוחות/,"🍽️"],[/סושי/,"🍣"],[/פיצ/,"🍕"],[/בורגר/,"🍔"],[/קפה|coffee|cafe/i,"☕"],[/מאפ|לחם|בייקרי|קונדיטור|עוג/,"🥐"],[/גליד|ice ?cream/i,"🍦"],[/שוקולד|מתוק|sweet/i,"🍫"],[/יין|יקב|wine|בירה|אלכוהול/i,"🍷"],[/סופר|מרקט|מזון|שוק|מכולת|יוחננוף|ויקטורי|קרפור/,"🛒"],[/נעל|shoe|הנעלה|אלדו|steve/i,"👟"],[/אופנ|בגד|ג'ינס|jeans|זארה|zara|קסטרו|fox|הלבשה|גולף|רנואר|mango|h&o/i,"👕"],[/תכשיט|צורף|jewel/i,"💍"],[/אופטיק|משקפ/,"👓"],[/ספר|סטימצקי|book/i,"📚"],[/צעצוע|טויס|ילדים|תינוק|kids/i,"🧸"],[/חיות|pet|ג'ונגל/i,"🐾"],[/פארם|קוסמטיק|טיפוח|בושם|sabon|beauty/i,"💄"],[/ספורט|כושר|sport|fit/i,"⚽"],[/חשמל|אלקטרוני|מחשב|טלפון|ivory|באג|ksp/i,"🔌"],[/בית|רהיט|טקסטיל|מטבח|home|ace|הום/i,"🛋️"],[/קולנוע|סינמ|cinema/i,"🎬"],[/תיאטרון|הצג|מופע|הופע|היכל/,"🎭"],[/ספא|עיסוי|spa/i,"💆"],[/מלון|צימר|נופש|חופש|hotel/i,"🏨"],[/פארק|אטרקצי|מוזיאון|גן חיות|באולינג|טרמפולינ|קרטינג|ג'אמפ|jump/i,"🎡"],[/פרח|משתל/,"💐"],[/רכב|מוסך|דלק|צמיג/,"🚗"]];
+const ICONS=[[/מסעד|בורגר|המבורגר|שניצל|גריל|סטייק|אסייתי|נודלס|סושי|פיצ|פסטה|חומוס|פלאפל|שווארמה|בשר|דיינר|ביסטרו|ארוחות/,"🍽️"],[/סושי/,"🍣"],[/פיצ/,"🍕"],[/בורגר/,"🍔"],[/קפה|coffee|cafe/i,"☕"],[/מאפ|לחם|בייקרי|קונדיטור|עוג/,"🥐"],[/גליד|ice ?cream/i,"🍦"],[/שוקולד|מתוק|sweet/i,"🍫"],[/יין|יקב|wine|בירה|אלכוהול/i,"🍷"],[/סופר|מרקט|מזון|שוק|מכולת|יוחננוף|ויקטורי|קרפור/,"🛒"],[/נעל|shoe|הנעלה|אלדו|steve/i,"👟"],[/אופנ|בגד|ג'ינס|jeans|זארה|zara|קסטרו|fox|פוקס|הלבשה|גולף|רנואר|mango|h&o|טרמינל|אמריקן איגל|ליוויס|הוניגמן|טוונטי|ברשקה|bershka|pull|מנגו/i,"👕"],[/תכשיט|צורף|jewel/i,"💍"],[/אופטיק|משקפ/,"👓"],[/ספר|סטימצקי|book/i,"📚"],[/צעצוע|טויס|ילדים|תינוק|kids/i,"🧸"],[/חיות|pet|ג'ונגל/i,"🐾"],[/פארם|קוסמטיק|טיפוח|בושם|סבון|sabon|beauty|ללין|אהבה|ahava|בודי שופ/i,"💄"],[/ספורט|כושר|sport|fit/i,"⚽"],[/חשמל|אלקטרוני|מחשב|טלפון|ivory|באג|ksp/i,"🔌"],[/בית|רהיט|טקסטיל|מטבח|home|ace|הום/i,"🛋️"],[/קולנוע|סינמ|cinema/i,"🎬"],[/תיאטרון|הצג|מופע|הופע|היכל/,"🎭"],[/ספא|עיסוי|spa/i,"💆"],[/מלון|צימר|נופש|חופש|hotel/i,"🏨"],[/פארק|אטרקצי|מוזיאון|גן חיות|באולינג|טרמפולינ|קרטינג|ג'אמפ|jump/i,"🎡"],[/פרח|משתל/,"💐"],[/רכב|מוסך|דלק|צמיג/,"🚗"]];
 function emo(x){const t=x.n+" "+(x.cat||"")+" "+x.i.map(i=>i.d+" "+i.p).join(" ");let e="🏷️";for(const [re,ic] of ICONS){if(re.test(x.n)){return ic}}for(const [re,ic] of ICONS){if(re.test(t)){e=ic;break}}return e}
 function iconHTML(x){const img=x.img||(x.i.find(i=>i.img)||{}).img;return `<div class="ic">${img?`<img src="${esc(img)}" alt="" loading="lazy" onerror="this.parentNode.textContent='${emo(x)}'">`:emo(x)}</div>`}
 const clubOk=it=>!club||it.c.startsWith(club);
